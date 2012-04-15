@@ -2,140 +2,193 @@
  * Dices3 jQuery
  * Author: Garland Davis
  */
-(function($) {
-	var rollString;
-	var lastRoll;
-	var largeRoll;
+;(function($) {
+	dices = function() {
+		
+	};
 
-	function test(){
-		$(this).html("test");
-	}
+	$.extend(dices, {
+		data: {
+			rollHistory: "",
+			rollString: "",
+			lastRoll: 0,
+			rolls: [],
 
-	function doRoll( dice, power ){
-		if ( !dice || dice.length < 3 ){
+			version: "0.0.1a"
+		},
+
+		config: {
+			showAll: false,
+			multiMod: false,
+			dropLowest: 0
+		},
+
+		version: function() {
+			return dices.data.version;
+		},
+		
+		config: function(option) {
+			
+		}
+	});
+	
+	doRoll = function(dice, power) {
+		if (!dice || dice.length < 3) {
 			addResult( "Invalid dice roll\n<br />" );
 			return false;
 		}
-		if ( dice.indexOf("+", 0) < 1 && dice.indexOf("-", 0) < 1 )
+		if (dice.indexOf("+", 0) < 1 && dice.indexOf("-", 0) < 1) {
 			dice += "+0";
+		}
 		lastRoll = roll(dice, power);
 
-		displayRoll( dice, lastRoll );
+		displayRoll(dice, lastRoll);
 		return false;
 	}
 
-	function percRoll(){
+	percRoll = function() {
 		lastRoll = roll("1d100+0");
-		addResult( "Percentage = <strong>"+lastRoll+"%</strong>\n" );
+		addResult("Percentage = <strong>"+lastRoll+"%</strong>\n");
 	}
 
-	function displayRoll( dice, result ){
+	displayRoll = function(dice, result) {
 		diceDisplay = dice;
-		if ( dice.indexOf("+0", 0) > 0 )
+		if (dice.indexOf("+0", 0) > 0) {
 			diceDisplay = dice.substring(0, dice.indexOf("+0", 0));
+		}
 		var output;
 
-		if ( $("#showall").is(':checked') )
-			output = "<em>{0}</em> = <strong>{1}</strong> ({2})\n".format( diceDisplay, result, rollString );
-		else
-			output = "<em>{0}</em> = <strong>{1}</strong>\n".format( diceDisplay, result );
-		addResult( output );
+		if (dices.config.showAll) {
+			output = "<em>{0}</em> = <strong>{1}</strong> ({2})\n".format(diceDisplay, result, rollString);
+		}
+		else {
+			output = "<em>{0}</em> = <strong>{1}</strong>\n".format(diceDisplay, result);
+		}
+		addResult(output);
 	}
 
-	function roll( dice, power ){
-		if ( !power || power < 1 )
-			power = 1;
-		if ( !dice )
-			return 0;
+	parseRoll = function(dice) {
+		var start, index, negative = 0;
+		var roll = {
+			count: 0,
+			sides: 0,
+			bonues: 0
+		};
 
-		var start = 0;
-		var index = dice.indexOf("d", start);
+		if (!dice || dice == "") {
+			return roll;
+		}
 
-		if (index < start)
-			return 0;
+		dice = dice.toLowerCase();
+		index = dice.indexOf("d", start);
 
-		largeRoll = false;
+		if (index < start) {
+			return roll;
+		}
+
 		var myString = dice.substring(start, index);
-		var count = parseInt(myString);
-		if ( count > 4 )
-			largeRoll = true;
+		roll.count = parseInt(myString);
 
 		start = index + 1;
 		index = dice.indexOf('+', start);
 
-		var negative = (index < start);
+		negative = (index < start);
 
-		if (negative)
+		if (negative) {
 			index = dice.indexOf('-', start);
-		if (index < start)
+		}
+
+		if (index < start) {
 			index = dice.length;
+		}
 
-		if (index == dice.length)
-			return 0;
+		if (index == dice.length) {
+			return roll;
+		}
 
-		var myString = dice.substring(start, index);
-		var sides = parseInt(myString);
-		sides /= power;
+		myString = dice.substring(start, index);
+		roll.sides = parseInt(myString);
 
 		start = index + 1;
 		index = dice.length;
 
-		var myString = dice.substring(start, index);
-		var bonus = parseInt(myString);
-		if (negative)
-			bonus *= -1;
+		myString = dice.substring(start, index);
+		roll.bonus = parseInt(myString);
 
-		var result = 0;
-
-		var rolls = new Array();
-		var temp = "";
-		for (var i = 0; i < count; ++i){
-			var roll = Math.round(Math.random()*(sides-1))+1;
-			if ( $("#multimod").is(':checked') )
-				roll += bonus;
-			result += roll;
-			rolls[i] = roll;
-			if ( i == 0 )
-				temp = roll;
-			else
-				temp += " + "+roll;
+		if (negative) {
+			roll.bonus *= -1;
 		}
 
-		if ( $("#droplowest").is(':checked') && $("#dropValue").val() > 0 ){
+		return roll;
+	}
+
+	roll = function(dice, power) {
+		var result = 0;
+		var rolls = [];
+		var temp = "";
+
+		if (!dice) {
+			return 0;
+		}
+		if (!power || power < 1) {
+			power = 1;
+		}
+
+		var roll = parseRoll(dice);
+		roll.sides /= power;
+
+		for (var i = 0; i < roll.count; ++i) {
+			r = Math.round(Math.random()*(roll.sides-1))+1;
+			if (dices.config.multiMod) {
+				r += bonus;
+			}
+			result += r;
+			//roll.rolls[i] = r;
+			if (i == 0) {
+				temp = r;
+			}
+			else {
+				temp += " + "+r;
+			}
+		}
+
+		if (dices.config.dropLowest > 0) {
 			result = 0;
 			rolls.sort(sortNumber);
-			rolls.length -= $("#dropValue").val();
-			for (var i = 0; i < rolls.length; ++i){
-				var roll = rolls[i];
-				result += roll;
-				if ( i == 0 )
-					temp = roll;
-				else
-					temp += " + "+roll;
+			rolls.length -= D.config.dropLowest;
+			for (i = 0; i < rolls.length; ++i){
+				r = rolls[i];
+				result += r;
+				if ( i == 0 ){
+					temp = r;
+				}
+				else{
+					temp += " + "+r;
+				}
 			}
 		}
 
 		result *= power;
-		if ( !$("#multimod").is(':checked') && bonus > 0 ){
+		if (dices.config.multiMod && bonus > 0) {
 			temp += " + "+bonus;
 			result += bonus;
 		}
-		rollString = temp;
+		dices.data.rollString = temp;
 
 		return result;
 	}
 
-	function sortNumber(a,b){
+	sortNumber = function(a,b) {
 		return b - a;
 	}
 
-	function addResult( result ){
-		if ($("#results").html().length > 1)
+	addResult = function(result) {
+		if ($("#results").html().length > 1){
 			$("#results").append("<hr />");
+		}
 		$("#results").append(result);
 		$("#results").scrollTop($("#results")[0].scrollHeight);
 	}
 
-	$.fn.test = test;
 	$.fn.roll = roll;
-})( jQuery );
+})(jQuery);

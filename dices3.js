@@ -1,8 +1,8 @@
 /*
- * Dices3 jQuery
+ * Dices3
  * Author: Garland Davis
  */
-;(function($) {
+;(function() {
 	dices = {
 		data: {
 			rollHistory: "",
@@ -21,10 +21,6 @@
 
 		version: function() {
 			return dices.data.version;
-		},
-		
-		config: function(option) {
-			
 		},
 		
 		parseRoll: function(dice) {
@@ -146,4 +142,4 @@
 			return b - a;
 		}
 	};
-})(jQuery);
+})();

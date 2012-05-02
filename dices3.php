@@ -6,6 +6,8 @@
 class dices {
 	private $version = "3.0.4";
 
+	private static $app = null;
+
 	private $rollHistory = "";
 	private $rollString = "";
 	private $lastRoll = 0;
@@ -22,6 +24,13 @@ class dices {
 	public function getShowAll() { return $this->showAll; }
 	public function getMultiMod() { return $this->multiMod; }
 	public function getDropLowest() { return $this->dropLowest; }
+
+	public function app() {
+		if (self::$app == null) {
+			self::$app = new dices();
+		}
+		return self::$app;
+	}
 
 	public function version() {
 		return $this->version;
@@ -153,3 +162,5 @@ class dices {
 		$this->roll($dice);
 	}
 }
+
+echo dices::app()->roll("1d6+0");

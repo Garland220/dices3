@@ -10,7 +10,7 @@
 			lastRoll: 0,
 			rolls: [],
 
-			version: "3.0.2"
+			version: "3.0.4"
 		},
 
 		config: {
@@ -41,6 +41,7 @@
 
 			dice = dice.toLowerCase();
 			index = dice.indexOf("d", start);
+			
 
 			if (index < start) {
 				return roll;
@@ -82,60 +83,66 @@
 			return roll;
 		},
 
-		roll: function(dice, power) {
-			var result = 0;
-			var rolls = [];
-			var temp = "";
+		parse: function(dice) {
+			return parseRoll(dice);
+		},
 
-			if (!dice) {
-				return 0;
+		getResult: function(count, sides, bonus) {
+			var result = {
+				total: 0,
+				rolls: [],
+				rollString: ""
+			};
+
+			if (count == 0 || sides == 0) {
+				return result;
 			}
-			if (!power || power < 1) {
-				power = 1;
-			}
 
-			var roll = dices.parseRoll(dice);
-			roll.sides /= power;
-
-			for (var i = 0; i < roll.count; ++i) {
-				r = Math.round(Math.random()*(roll.sides-1))+1;
+			for (i = 0; i < count; ++i) {
+				r = Math.round(Math.random()*(sides-1))+1;
 				if (dices.config.multiMod) {
 					r += bonus;
 				}
-				result += r;
-				//roll.rolls[i] = r;
-				if (i == 0) {
-					temp = r;
-				}
-				else {
-					temp += " + "+r;
-				}
+
+				result.rolls[i] = r;
 			}
 
 			if (dices.config.dropLowest > 0) {
-				result = 0;
-				rolls.sort(dices.sortNumber);
-				rolls.length -= D.config.dropLowest;
-				for (i = 0; i < rolls.length; ++i){
-					r = rolls[i];
-					result += r;
-					if ( i == 0 ){
-						temp = r;
-					}
-					else{
-						temp += " + "+r;
-					}
-				}
+				result.total = 0;
+
+				result.rolls.sort(dices.sortNumber);
+				result.rolls.length -= dices.config.dropLowest;
 			}
 
-			result *= power;
-			if (dices.config.multiMod && bonus > 0) {
-				temp += " + "+bonus;
-				result += bonus;
-			}
-			dices.data.rollString = temp;
+			for (i = 0; i < result.rolls.length; ++i) {
+				r = result.rolls[i];
+				result.total += r;
 
-			return result;
+				if (i != 0) { result.rollString += " + "+r; }
+				else{ result.rollString = r; }
+			}
+
+			if (!dices.config.multiMod && bonus > 0) {
+				result.rollString += " + "+bonus;
+				result.total += bonus;
+			}
+
+			return result
+		},
+
+		roll: function(dice) {
+			if (!dice) {
+				return 0;
+			}
+
+			var d = dices.parseRoll(dice);
+			var r = dices.getResult(d.count, d.sides, d.bonus);
+
+			return r.total;
+		},
+
+		r: function(dice, power) {
+			return dices.roll(dice, power);
 		},
 		
 		sortNumber: function(a,b) {

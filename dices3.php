@@ -4,7 +4,7 @@
  * Author: Garland Davis
  */
 class dices {
-	private $version = "3.0.2";
+	private $version = "3.0.4";
 
 	private $rollHistory = "";
 	private $rollString = "";
@@ -14,6 +14,14 @@ class dices {
 	private $showAll = false;
 	private $multiMod = false;
 	private $dropLowest = 0;
+
+	public function setShowAll($x) { $this->showAll = $x; }
+	public function setMultiMod($x) { $this->multiMod = $x; }
+	public function setDropLowest($x) { $this->dropLowest = $x; }
+
+	public function getShowAll() { return $this->showAll; }
+	public function getMultiMod() { return $this->multiMod; }
+	public function getDropLowest() { return $this->dropLowest; }
 
 	public function version() {
 		return $this->version;
@@ -78,48 +86,70 @@ class dices {
 		return $roll;
 	}
 
-	public function roll($dice, $power=1) {
-		$result = 0;
-		$rolls = array();
-		$temp = "";
+	public function parse($dice) {
+		return $this->parseRoll($dice);
+	}
 
+	public function getResult($count, $sides, $bonus) {
+		$result = array(
+			"total" => 0,
+			"rolls" => array(),
+			"rollString" => ""
+		);
+
+		for ($i = 0; $i < $count; ++$i) {
+			$r = ceil(lcg_value() * $sides-1)+1;
+			if ($this->multiMod) {
+				$r += $bonus;
+			}
+
+			$result['rolls'][$i] = $r;
+		}
+
+		if (!empty($this->dropLowest)) {
+			natsort($result['rolls']);
+
+			$result['rolls'] = array_slice(
+				$result['rolls'],
+				count($result['rolls']) - $this->dropLowest,
+				count($result['rolls'])
+			);
+		}
+
+		for ($i = 0; $i < count($result['rolls']); ++$i) {
+			$r = $result['rolls'][$i];
+			$result['total'] += $r;
+
+			if ($i == 0) {
+				$result['rollString'] = $r;
+			}
+			else {
+				$result['rollString'] .= " + " . $r;
+			}
+		}
+
+		if (!$this->multiMod && $bonus > 0) {
+			$result['rollString'] .= " + " . $bonus;
+			$result['total'] += $bonus;
+		}
+
+		$this->rollString = $result['rollString'];
+
+		return $result;
+	}
+
+	public function roll($dice) {
 		if (empty($dice)) {
 			return 0;
 		}
 
-		if (empty($power) || $power < 1){
-			$power = 1;
-		}
+		$d = $this->parseRoll($dice);
+		$r = $this->getResult($d['count'], $d['sides'], $d['bonus']);
 
-		$roll = $this->parseRoll($dice);
-		$roll['sides'] /= $power;
+		return $r['total'];
+	}
 
-		for ($i = 0; $i < $roll['count']; ++$i) {
-			$r = ceil(lcg_value() * $roll['sides']-1)+1;
-			if ($this->multiMod) {
-				$r += $roll['bonus'];
-			}
-			$result += $r;
-			if ($i == 0) {
-				$temp = $r;
-			}
-			else {
-				$temp .= " + " . $r;
-			}
-		}
-
-		if ($this->dropLowest) {
-			$result = 0;
-			natsort($rolls);
-		}
-
-		$result *= $power;
-		if ($this->multiMod && $roll['bonus'] > 0) {
-			$temp .= " + " . $roll['bonus'];
-			$result += $roll['bonus'];
-		}
-		$this->rollString = $temp;
-
-		return $result;
+	public function r($dice) {
+		$this->roll($dice);
 	}
 }

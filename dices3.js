@@ -107,13 +107,13 @@
       }
 
 
-      if (this.isInt(options.dropLowest)) {
+      if (this.isInt(options.dropLowest) && options.dropLowest > 0) {
 
         rolls.sort(this.highSort);
         rolls.length -= options.dropLowest;
 
       }
-      if (this.isInt(options.dropHighest)) {
+      if (this.isInt(options.dropHighest) && options.dropLowest > 0) {
 
         rolls.sort(this.lowSort);
         rolls.length -= options.dropHighest;

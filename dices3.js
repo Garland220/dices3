@@ -1,152 +1,198 @@
 /*
- * Dices3
- * Author: Garland Davis
+ * Dices 3.1
  */
-;(function() {
-	dices = {
-		data: {
-			rollHistory: "",
-			rollString: "",
-			lastRoll: 0,
-			rolls: [],
+(function() {
+  'use strict';
 
-			version: "3.0.4"
-		},
 
-		config: {
-			showAll: false,
-			multiMod: false,
-			dropLowest: 0
-		},
+  window.dices = {
 
-		version: function() {
-			return dices.data.version;
-		},
-		
-		parseRoll: function(dice) {
-			var start, index, negative = 0;
-			var roll = {
-				count: 0,
-				sides: 0,
-				bonues: 0
-			};
 
-			if (!dice || dice == "") {
-				return roll;
-			}
+    /**
+     * Parses a dice string (e.g '1d6') into an object
+     * 
+     * @param  {string} 
+     * @return {object} return an object containing count, sides, and modifier values
+     */
+    parseRoll: function(roll) {
 
-			if (dice.indexOf("+", 0) < 1 && dice.indexOf("-", 0) < 1) {
-				dice += "+0";
-			}
+      /** @private */
+      var dice = {},
+          arr;
 
-			dice = dice.toLowerCase();
-			index = dice.indexOf("d", start);
-			
+      roll = roll.toLowerCase();
 
-			if (index < start) {
-				return roll;
-			}
+      if (roll.indexOf('d') === -1) {
+        return 0;
+      }
+      else {
 
-			var myString = dice.substring(start, index);
-			roll.count = parseInt(myString);
+        arr = roll.split('d');
 
-			start = index + 1;
-			index = dice.indexOf('+', start);
+        dice.count = parseInt(arr[0]);
 
-			negative = (index < start);
+        if (arr[1]) {
+          if (arr[1].indexOf('+') !== -1) {
+            arr = arr[1].split('+');
+            dice.modifier = parseInt(arr[1]);
+          }
+          else if (arr[1].indexOf('-') !== -1) {
+            arr = arr[1].split('-');
+            dice.modifier = parseInt(arr[1]) * -1;
+          }
+          else {
+            arr[0] = arr[1];
+            dice.modifier = 0;
+          }
+          dice.sides = parseInt(arr[0]);
+        }
 
-			if (negative) {
-				index = dice.indexOf('-', start);
-			}
+      }
 
-			if (index < start) {
-				index = dice.length;
-			}
+      return dice;
 
-			if (index == dice.length) {
-				return roll;
-			}
+    },
 
-			myString = dice.substring(start, index);
-			roll.sides = parseInt(myString);
 
-			start = index + 1;
-			index = dice.length;
+    /**
+     * Rolls the dice, and handles the result based on optional parameters, then returns the result object
+     * 
+     * @param  {object} dice     The dice to be rolled, if string, calls parseDice.
+     * @param  {object} options  An object containing optional parameter overrides.
+     * @return {object}          A object containing all of the roll results, as well as the total.
+     */
+    roll: function(dice, options) {
 
-			myString = dice.substring(start, index);
-			roll.bonus = parseInt(myString);
+      /** @private */
+      var rolled = 0,
+          total = 0,
+          rolls = [],
+          parsedDice,
+          i;
 
-			if (negative) {
-				roll.bonus *= -1;
-			}
+      this.roll.history = this.roll.history || [];
 
-			return roll;
-		},
+      options = this.extend({
+        multiMod    :  false, // Add modifier to for each dice rolled, instead of only once.
+        dropLowest  :  0,     // Useful for quick character stats generation
+        dropHighest :  0,     // I don't know why you'd need this, but here it is anyway!
+        multiplier  :  1      // Probably only useful for very specific needs
+      }, options);
 
-		parse: function(dice) {
-			return parseRoll(dice);
-		},
 
-		getResult: function(count, sides, bonus) {
-			var result = {
-				total: 0,
-				rolls: [],
-				rollString: ""
-			};
+      if (!dice) {
+        return 0;
+      }
+      else if (typeof dice === 'string') {
+        parsedDice = this.parseRoll(dice);
+      }
+      else if (typeof dice === 'object' && this.isInt(dice.count) && this.isInt(dice.sides)) {
+        parsedDice = dice;
+      }
+      else {
+        return 0;
+      }
 
-			if (count == 0 || sides == 0) {
-				return result;
-			}
+      for (i = 0; i < parsedDice.count; ++i) {
 
-			for (i = 0; i < count; ++i) {
-				r = Math.round(Math.random()*(sides-1))+1;
-				if (dices.config.multiMod) {
-					r += bonus;
-				}
+        rolled = Math.round(Math.random() * (parsedDice.sides - 1)) + 1;
 
-				result.rolls[i] = r;
-			}
+        if (options.multiMod) {
+          rolled += parsedDice.modifier;
+        }
 
-			if (dices.config.dropLowest > 0) {
-				result.total = 0;
+        rolls.push(rolled);
+        this.roll.history.push(rolled);
 
-				result.rolls.sort(dices.sortNumber);
-				result.rolls.length -= dices.config.dropLowest;
-			}
+      }
 
-			for (i = 0; i < result.rolls.length; ++i) {
-				r = result.rolls[i];
-				result.total += r;
 
-				if (i != 0) { result.rollString += " + "+r; }
-				else{ result.rollString = r; }
-			}
+      if (this.isInt(options.dropLowest)) {
 
-			if (!dices.config.multiMod && bonus > 0) {
-				result.rollString += " + "+bonus;
-				result.total += bonus;
-			}
+        rolls.sort(this.highSort);
+        rolls.length -= options.dropLowest;
 
-			return result
-		},
+      }
+      if (this.isInt(options.dropHighest)) {
 
-		roll: function(dice) {
-			if (!dice) {
-				return 0;
-			}
+        rolls.sort(this.lowSort);
+        rolls.length -= options.dropHighest;
 
-			var d = dices.parseRoll(dice);
-			var r = dices.getResult(d.count, d.sides, d.bonus);
+      }
 
-			return r.total;
-		},
 
-		r: function(dice, power) {
-			return dices.roll(dice, power);
-		},
-		
-		sortNumber: function(a,b) {
-			return b - a;
-		}
-	};
+      for (i = 0; i < rolls.length; ++i) {
+
+        total += rolls[i];
+
+      }
+
+      total = total * options.multiplier;
+
+      return {
+        rolls: rolls,
+        total: total
+      };
+
+    },
+
+
+    /**
+     * Overrides values of one object with the values of another.
+     */
+    extend: function(a, b) {
+
+      for(var key in b) {
+
+        if(b.hasOwnProperty(key)) {
+          a[key] = b[key];
+        }
+
+      }
+
+      return a;
+
+    },
+
+
+    /**
+     * Sorts from highest to lowest.
+     */
+    highSort: function(a, b) {
+
+      return b - a;
+
+    },
+
+
+    /**
+     * Sorts from lowest to highest.
+     */
+    lowSort: function(a, b) {
+
+      return a - b;
+
+    },
+
+
+    /**
+     * Returns true if parameter is integer.
+     */
+    isInt: function(n) {
+
+      return n === parseInt(n);
+
+    },
+
+
+    version: function() {
+
+      return "3.1.0";
+
+    },
+
+
+  };
+
+
 })();

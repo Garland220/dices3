@@ -29,22 +29,22 @@
 
         arr = roll.split('d');
 
-        dice.count = parseInt(arr[0]);
+        dice.count = parseInt(arr[0], 10);
 
         if (arr[1]) {
           if (arr[1].indexOf('+') !== -1) {
             arr = arr[1].split('+');
-            dice.modifier = parseInt(arr[1]);
+            dice.modifier = parseInt(arr[1], 10);
           }
           else if (arr[1].indexOf('-') !== -1) {
             arr = arr[1].split('-');
-            dice.modifier = parseInt(arr[1]) * -1;
+            dice.modifier = parseInt(arr[1], 10) * -1;
           }
           else {
             arr[0] = arr[1];
             dice.modifier = 0;
           }
-          dice.sides = parseInt(arr[0]);
+          dice.sides = parseInt(arr[0], 10);
         }
 
       }
@@ -180,14 +180,14 @@
      */
     isInt: function(n) {
 
-      return n === parseInt(n);
+      return n === parseInt(n, 10);
 
     },
 
 
     version: function() {
 
-      return "3.1.0";
+      return '3.1.0';
 
     },
 

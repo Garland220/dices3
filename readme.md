@@ -27,10 +27,10 @@ PHP
 Options
 --------------
 
-	multiMod    (Default: false)  - Add modifier to for each dice rolled, instead of only once.
+	multiMod  (Default: false)  - Add modifier to for each dice rolled, instead of only once.
 
-	dropLowest  (Default: 0)      - Useful for quick character stats generation
+	dropLowest  (Default: 0)    - Useful for quick character stats generation
 
-	dropHighest (Default: 0)      - I don't know why you'd need this, but here it is anyway!
+	dropHighest (Default: 0)    - I don't know why you'd need this, but here it is anyway!
 
-	multiplier  (Default: 1)      - Probably only useful for very specific needs
+	multiplier  (Default: 1)    - Probably only useful for very specific needs. Multies roll, before adding modifier

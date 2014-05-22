@@ -74,7 +74,7 @@ class dices {
 			'multiMod' 	  =>  false, // Add modifier to for each dice rolled, instead of only once.
 			'dropLowest'  =>  0,     // Useful for quick character stats generation
 	        'dropHighest' =>  0,     // I don't know why you'd need this, but here it is anyway!
-	        'multiplier'  =>  1      // Probably only useful for very specific needs
+	        'multiplier'  =>  1      // Probably only useful for very specific needs. Multies roll, before adding modifier
 		), $options);
 
 		if (empty($dice)) {

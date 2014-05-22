@@ -1,19 +1,33 @@
 Dices3.1
 ==============
 
-A simple, light, and accurate dice rolling library, for both PHP, and JavaScript.
+A simple, light, and flexible dice rolling library, for both PHP, and JavaScript.
 
 
 Javascript
 --------------
+
 	dices.roll("1d6+4"); // Rolls 1 dice with 6 sides, and adds a modifier of 4 to the result
 
+**With options**
+
+	dices.roll('4d6', {dropLowest: 1}); // Will roll 4 dice with 6 sides, and drop the lowest one from the result.
 
 PHP
 --------------
-	$dices = new dices(); // Create a new instance of dices
-	$dices->roll("1d6+4"); // Rolls 1 dice with 6 sides, and adds a modifier of 4 to the result
 
-**- OR -**
+	dices::roll("1d6+4"); // Rolls 1 dice with 6 sides, and adds a modifier of 4 to the result
 
-	dices::app()->roll("1d6+4"); // Rolls 1 dice with 6 sides, and adds a modifier of 4 to the result
+**With options**
+
+	dices::roll('4d6', array('dropLowest' => 1)); // Will roll 4 dice with 6 sides, and drop the lowest one from the result.
+
+
+
+Options
+--------------
+
+multiMod    (Default: false)  - Add modifier to for each dice rolled, instead of only once.
+dropLowest  (Default: 0)      - Useful for quick character stats generation
+dropHighest (Default: 0)      - I don't know why you'd need this, but here it is anyway!
+multiplier  (Default: 1)      - Probably only useful for very specific needs

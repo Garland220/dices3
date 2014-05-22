@@ -17,13 +17,17 @@
     parseRoll: function(roll) {
 
       /** @private */
-      var dice = {},
+      var dice = {
+            count: 0,
+            sides: 0,
+            modifier: 0
+          },
           arr;
 
       roll = roll.toLowerCase();
 
       if (roll.indexOf('d') === -1) {
-        return 0;
+        return dice;
       }
       else {
 
@@ -42,7 +46,6 @@
           }
           else {
             arr[0] = arr[1];
-            dice.modifier = 0;
           }
           dice.sides = parseInt(arr[0], 10);
         }

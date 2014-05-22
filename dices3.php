@@ -1,166 +1,184 @@
 <?php
+
 /*
- * Dices3
- * Author: Garland Davis
+ * Dices3.1
  */
 class dices {
-	private $version = "3.0.4";
 
-	private static $app = null;
+	private static $version = '3.1.0';
+	private static $app = false;
 
-	private $rollHistory = "";
-	private $rollString = "";
-	private $lastRoll = 0;
-	private $rolls = array();
-
-	private $showAll = false;
-	private $multiMod = false;
-	private $dropLowest = 0;
-
-	public function setShowAll($x) { $this->showAll = $x; }
-	public function setMultiMod($x) { $this->multiMod = $x; }
-	public function setDropLowest($x) { $this->dropLowest = $x; }
-
-	public function getShowAll() { return $this->showAll; }
-	public function getMultiMod() { return $this->multiMod; }
-	public function getDropLowest() { return $this->dropLowest; }
-
-	public function app() {
-		if (self::$app == null) {
-			self::$app = new dices();
+	/**
+	 * Prevent construction, should always be treated as static
+	 */
+	private function __construct() {}
+	private static function app() {
+		if (self::$app) {
+			return;
 		}
-		return self::$app;
 	}
 
-	public function version() {
-		return $this->version;
-	}
+	/**
+     * Parses a dice string (e.g '1d6') into an array
+     * 
+     * @param  {string} 
+     * @return {array} return an array containing count, sides, and modifier values
+     */
+	public function parseRoll($roll) {
 
-	public function parseRoll($dice) {
-		$start = $index = $negative = 0;
-		$roll = array(
-			"count" => 0,
-			"sides" => 0,
-			"bonues" => 0
+		$dice = array(
+			'count' => 0,
+			'sides' => 0,
+			'modifier' => 0
 		);
+		$arr = array();
+		$roll = strtolower($roll);
+
+		if (empty($roll)) {
+			return $dice;
+		}
+		else if (strrpos($roll, 'd') === -1) {
+			return $dice;
+		}
+		else {
+			$arr = split('d', $roll);
+
+			$dice['count'] = intval($roll[0], 10);
+
+			if ($arr[1]) {
+				if (strrpos($arr[1], '+')) {
+					$arr = split($arr[1], '+');
+					$dice['modifier'] = intval($arr[1], 10);
+				}
+				else if (strrpos($arr[1], '-')) {
+					$arr = split($arr[1], '-');
+					$dice['modifier'] = intval($arr[1], 10) * -1;
+				}
+				else {
+					$arr[0] = intval($arr[1], 10);
+				}
+
+				$dice['sides'] = $arr[0];
+			}
+		}		
+
+		return $dice;
+	}
+
+
+	/**
+     * Rolls the dice, and handles the result based on optional parameters, then returns the result array
+     * 
+     * @param  {array} dice     The dice to be rolled, if string, calls parseDice.
+     * @param  {array} options  An array containing optional parameter overrides.
+     * @return {array}          A array containing all of the roll results, as well as the total.
+     */
+	public function roll($dice, $options = array()) {
+
+		$result = array(
+			'rolls' => array(),
+			'total' => 0,
+		);	
+		$parsedDice;
+
+		$options = array_merge(array(
+			'multiMod' 	  =>  false, // Add modifier to for each dice rolled, instead of only once.
+			'dropLowest'  =>  0,     // Useful for quick character stats generation
+	        'dropHighest' =>  0,     // I don't know why you'd need this, but here it is anyway!
+	        'multiplier'  =>  1      // Probably only useful for very specific needs
+		), $options);
 
 		if (empty($dice)) {
-			return $roll;
+			echo 'empty';
+			return $result;
+		}
+		else if (is_string($dice)) {
+			$parsedDice = self::parseRoll($dice);
+		}
+		else if (is_array($dice)) {
+			$parsedDice = $dice;
+		}
+		else {
+			echo 'test';
+			return $result;
 		}
 
-		if (strrpos($dice,"+") === FALSE && strrpos($dice,"-") === FALSE) {
-			$dice += "+0";
-		}
+		echo $options['multiplier'];
 
-		$dice = strtolower($dice);
-		$index = strrpos($dice,"d");
+		for ($i = 0; $i < $parsedDice['count']; ++$i) {
+			$rolled = ceil(lcg_value() * $parsedDice['sides'] - 1) + 1;
+			$rolled = $rolled * $options['multiplier'];
 
-		if ($index < $start) {
-			return $roll;
-		}
-
-		$myString = substr($dice, $start, $index);
-		$roll['count'] = intval($myString);
-
-		$start = $index + 1;
-		$index = strrpos($dice,'+');
-
-		$negative = ($index < $start);
-
-		if ($negative) {
-			$index = strrpos($dice,'-');
-		}
-
-		if ($index < $start) {
-			$index = strlen($dice);
-		}
-
-		if ($index == strlen($dice)) {
-			return $roll;
-		}
-
-		$myString = substr($dice, $start, $index);
-		$roll['sides'] = intval($myString);
-
-		$start = $index + 1;
-		$index = strlen($dice);
-
-		$myString = substr($dice, $start, $index);
-		$roll['bonus'] = intval($myString);
-
-		if ($negative) {
-			$roll['bonus'] *= -1;
-		}
-
-		return $roll;
-	}
-
-	public function parse($dice) {
-		return $this->parseRoll($dice);
-	}
-
-	public function getResult($count, $sides, $bonus) {
-		$result = array(
-			"total" => 0,
-			"rolls" => array(),
-			"rollString" => ""
-		);
-
-		for ($i = 0; $i < $count; ++$i) {
-			$r = ceil(lcg_value() * $sides-1)+1;
-			if ($this->multiMod) {
-				$r += $bonus;
+			if ($options['multiMod']) {
+				$rolled += $parsedDice['modifier'];
 			}
 
-			$result['rolls'][$i] = $r;
+			echo $rolled . " | ";
+
+			$result['rolls'][$i] = $rolled;
 		}
 
-		if (!empty($this->dropLowest)) {
+
+		if (!empty($options['dropLowest'])) {
+
 			natsort($result['rolls']);
 
 			$result['rolls'] = array_slice(
 				$result['rolls'],
-				count($result['rolls']) - $this->dropLowest,
+				count($result['rolls']) - $options['dropLowest'],
 				count($result['rolls'])
 			);
+
 		}
+
+
+		if (!empty($options['dropHighest'])) {
+
+			self::rnatsort($result['rolls']);
+
+			$result['rolls'] = array_slice(
+				$result['rolls'],
+				count($result['rolls']) - $options['dropHighest'],
+				count($result['rolls'])
+			);
+
+		}
+
 
 		for ($i = 0; $i < count($result['rolls']); ++$i) {
-			$r = $result['rolls'][$i];
-			$result['total'] += $r;
 
-			if ($i == 0) {
-				$result['rollString'] = $r;
-			}
-			else {
-				$result['rollString'] .= " + " . $r;
-			}
+			$result['total'] += $result['rolls'][$i];
+
 		}
 
-		if (!$this->multiMod && $bonus > 0) {
-			$result['rollString'] .= " + " . $bonus;
-			$result['total'] += $bonus;
+
+		if (!$options['multiMod']) {
+			$result['total'] += $parsedDice['modifier'];
 		}
 
-		$this->rollString = $result['rollString'];
 
 		return $result;
+
 	}
 
-	public function roll($dice) {
-		if (empty($dice)) {
-			return 0;
-		}
 
-		$d = $this->parseRoll($dice);
-		$r = $this->getResult($d['count'], $d['sides'], $d['bonus']);
+	/**
+	 * Reverse Natural Sorts the array.
+	 * 
+	 * @param  [array] $arr Takes an array
+	 * @return [array]      Returns same array, reverse natural sorted
+	 */
+	public function rnatsort(&$arr){
 
-		return $r['total'];
+	    natsort($arr);
+
+	    $arr = array_reverse($arr, true);
+
 	}
 
-	public function r($dice) {
-		$this->roll($dice);
+
+	public function version() {
+		return self::$version;
 	}
+
 }
-
-echo dices::app()->roll("1d6+0");

@@ -7,6 +7,7 @@ class dices {
 
 	private static $version = '3.1.0';
 
+
 	/**
      * Parses a dice string (e.g '1d6') into an array
      * 
@@ -52,6 +53,7 @@ class dices {
 		}		
 
 		return $dice;
+
 	}
 
 
@@ -173,7 +175,9 @@ class dices {
 
 
 	public function version() {
+
 		return self::$version;
+
 	}
 
 }

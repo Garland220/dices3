@@ -7,6 +7,8 @@
 
   window.dices = {
 
+    Version: '3.1.0',
+
 
     /**
      * Parses a dice string (e.g '1d6') into an object
@@ -193,7 +195,7 @@
 
     version: function() {
 
-      return '3.1.0';
+      return this.Version;
 
     },
 

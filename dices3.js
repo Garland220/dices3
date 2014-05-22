@@ -96,6 +96,7 @@
       for (i = 0; i < parsedDice.count; ++i) {
 
         rolled = Math.round(Math.random() * (parsedDice.sides - 1)) + 1;
+        rolled = rolled * options.multiplier;
 
         if (options.multiMod) {
           rolled += parsedDice.modifier;
@@ -127,7 +128,9 @@
 
       }
 
-      total = total * options.multiplier;
+      if (!options.multiMod) {
+        total += parsedDice.modifier;
+      }
 
       return {
         rolls: rolls,
@@ -196,3 +199,4 @@
 
 
 })();
+

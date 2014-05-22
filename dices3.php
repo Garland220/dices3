@@ -6,17 +6,6 @@
 class dices {
 
 	private static $version = '3.1.0';
-	private static $app = false;
-
-	/**
-	 * Prevent construction, should always be treated as static
-	 */
-	private function __construct() {}
-	private static function app() {
-		if (self::$app) {
-			return;
-		}
-	}
 
 	/**
      * Parses a dice string (e.g '1d6') into an array
@@ -160,6 +149,12 @@ class dices {
 		return $result;
 
 	}
+
+
+	/**
+	 * Prevent construction, should always be treated as static
+	 */
+	private function __construct() {}
 
 
 	/**

@@ -24,15 +24,12 @@
             sides: 0,
             modifier: 0
           },
+          indexAt = -1,
           i = 0,
-          l = 0,
-          arr = [],
-          indexAt = -1;
+          l = 0;
 
-      roll = roll.toLowerCase();
-
-      for(i=0, l=roll.length; i < l; i++) {
-        if (roll.charCodeAt(i) === 100) {
+      for (i=0, l=roll.length; i < l; i++) {
+        if (roll.charCodeAt(i) === 100 || roll.charCodeAt(i) === 68) {
           indexAt = i;
           break;
         }
@@ -45,7 +42,7 @@
 
         dice.count = parseInt(roll.substring(0, indexAt), 10);
 
-        for(i=0, l=roll.length; i < l; i++) {
+        for (i=0, l=roll.length; i < l; i++) {
           if (roll.charCodeAt(i) === 43) {
             dice.sides = parseInt(roll.substring(indexAt+1, i), 10);
             indexAt = i;
@@ -87,8 +84,6 @@
           i = 0,
           l = 0;
 
-      this.roll.history = this.roll.history || [];
-
       options = this.extend({
         multiMod    :  false, // Add modifier to for each dice rolled, instead of only once.
         dropLowest  :  0,     // Useful for quick character stats generation
@@ -120,7 +115,6 @@
         }
 
         rolls.push(rolled);
-        this.roll.history.push(rolled);
 
       }
 

@@ -7,13 +7,13 @@
 
   window.dices = {
 
-    Version: '3.1.0',
+    Version: '3.1.2',
 
 
     /**
-     * Parses a dice string (e.g '1d6') into an object
+     * Parses a dice string into an object
      * 
-     * @param  {string} 
+     * @param  {string} dice string to be parsed (e.g '1d6')
      * @return {object} return an object containing count, sides, and modifier values
      */
     parseRoll: function(roll) {
@@ -24,34 +24,45 @@
             sides: 0,
             modifier: 0
           },
-          arr;
+          i = 0,
+          l = 0,
+          arr = [],
+          indexAt = -1;
 
       roll = roll.toLowerCase();
 
-      if (roll.indexOf('d') === -1) {
+      for(i=0, l=roll.length; i < l; i++) {
+        if (roll.charCodeAt(i) === 100) {
+          indexAt = i;
+          break;
+        }
+      }
+
+      if (indexAt === -1) {
         return dice;
       }
       else {
 
-        arr = roll.split('d');
+        dice.count = parseInt(roll.substring(0, indexAt), 10);
 
-        dice.count = parseInt(arr[0], 10);
-
-        if (arr[1]) {
-          if (arr[1].indexOf('+') !== -1) {
-            arr = arr[1].split('+');
-            dice.modifier = parseInt(arr[1], 10);
+        for(i=0, l=roll.length; i < l; i++) {
+          if (roll.charCodeAt(i) === 43) {
+            dice.sides = parseInt(roll.substring(indexAt+1, i), 10);
+            indexAt = i;
+            dice.modifier = parseInt(roll.substring(indexAt+1, l), 10);
+            break;
           }
-          else if (arr[1].indexOf('-') !== -1) {
-            arr = arr[1].split('-');
-            dice.modifier = parseInt(arr[1], 10) * -1;
+          else if (roll.charCodeAt(i) === 45) {
+            dice.sides = parseInt(roll.substring(indexAt+1, i), 10);
+            indexAt = i;
+            dice.modifier = parseInt(roll.substring(indexAt+1, l), 10) * -1;
+            break;
           }
-          else {
-            arr[0] = arr[1];
-          }
-          dice.sides = parseInt(arr[0], 10);
         }
 
+        if (!dice.sides) {
+          dice.sides = parseInt(roll.substring(indexAt+1, roll.length), 10);
+        }
       }
 
       return dice;
@@ -72,8 +83,9 @@
       var rolled = 0,
           total = 0,
           rolls = [],
-          parsedDice,
-          i;
+          parsedDice = {},
+          i = 0,
+          l = 0;
 
       this.roll.history = this.roll.history || [];
 
@@ -98,7 +110,7 @@
         return 0;
       }
 
-      for (i = 0; i < parsedDice.count; ++i) {
+      for (i = 0, l = parsedDice.count; i < l; ++i) {
 
         rolled = Math.round(Math.random() * (parsedDice.sides - 1)) + 1;
         rolled = rolled * options.multiplier;
@@ -113,6 +125,7 @@
       }
 
 
+      // TODO: Re-sort array back to original state, instead of leaving it sorted by value
       if (this.isInt(options.dropLowest) && options.dropLowest > 0) {
 
         rolls.sort(this.highSort);
@@ -127,7 +140,7 @@
       }
 
 
-      for (i = 0; i < rolls.length; ++i) {
+      for (i = 0, l = rolls.length; i < l; ++i) {
 
         total += rolls[i];
 

@@ -77,10 +77,16 @@
     roll: function(dice, options) {
 
       /** @private */
-      var rolled = 0,
-          total = 0,
-          rolls = [],
-          parsedDice = {},
+      var parsedDice = {
+            count: 0,
+            sides: 0,
+            modifier: 0
+          },
+          result = {
+            rolls: [],
+            total: 0
+          },
+          rolled = 0,
           i = 0,
           l = 0;
 
@@ -93,7 +99,7 @@
 
 
       if (!dice) {
-        return 0;
+        return result;
       }
       else if (typeof dice === 'string') {
         parsedDice = this.parseRoll(dice);
@@ -102,7 +108,7 @@
         parsedDice = dice;
       }
       else {
-        return 0;
+        return result;
       }
 
       for (i = 0, l = parsedDice.count; i < l; ++i) {
@@ -114,7 +120,7 @@
           rolled += parsedDice.modifier;
         }
 
-        rolls.push(rolled);
+        result.rolls.push(rolled);
 
       }
 
@@ -122,32 +128,29 @@
       // TODO: Re-sort array back to original state, instead of leaving it sorted by value
       if (this.isInt(options.dropLowest) && options.dropLowest > 0) {
 
-        rolls.sort(this.highSort);
-        rolls.length -= options.dropLowest;
+        result.rolls.sort(this.highSort);
+        result.rolls.length -= options.dropLowest;
 
       }
       if (this.isInt(options.dropHighest) && options.dropLowest > 0) {
 
-        rolls.sort(this.lowSort);
-        rolls.length -= options.dropHighest;
+        result.rolls.sort(this.lowSort);
+        result.rolls.length -= options.dropHighest;
 
       }
 
 
-      for (i = 0, l = rolls.length; i < l; ++i) {
+      for (i = 0, l = result.rolls.length; i < l; ++i) {
 
-        total += rolls[i];
+        result.total += result.rolls[i];
 
       }
 
       if (!options.multiMod) {
-        total += parsedDice.modifier;
+        result.total += parsedDice.modifier;
       }
 
-      return {
-        rolls: rolls,
-        total: total
-      };
+      return result;
 
     },
 

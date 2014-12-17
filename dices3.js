@@ -7,12 +7,12 @@
 
   window.dices = {
 
-    Version: '3.1.2',
+    Version: '3.1.3',
 
 
     /**
      * Parses a dice string into an object
-     * 
+     *
      * @param  {string} dice string to be parsed (e.g '1d6')
      * @return {object} return an object containing count, sides, and modifier values
      */
@@ -28,11 +28,14 @@
           i = 0,
           l = 0;
 
-      for (i=0, l=roll.length; i < l; i++) {
+      for (i=0, l=roll.length; i < l; i += 1) {
+
+        // finds index of 'd' or 'D' character in dice string
         if (roll.charCodeAt(i) === 100 || roll.charCodeAt(i) === 68) {
           indexAt = i;
           break;
         }
+
       }
 
       if (indexAt === -1) {
@@ -40,25 +43,25 @@
       }
       else {
 
-        dice.count = parseInt(roll.substring(0, indexAt), 10);
+        dice.count = roll.substring(0, indexAt) >> 0;
 
-        for (i=0, l=roll.length; i < l; i++) {
+        for (i=0, l=roll.length; i < l; i+=1) {
           if (roll.charCodeAt(i) === 43) {
-            dice.sides = parseInt(roll.substring(indexAt+1, i), 10);
+            dice.sides = roll.substring(indexAt+1, i) >> 0;
             indexAt = i;
-            dice.modifier = parseInt(roll.substring(indexAt+1, l), 10);
+            dice.modifier = roll.substring(indexAt+1, l) >> 0;
             break;
           }
           else if (roll.charCodeAt(i) === 45) {
-            dice.sides = parseInt(roll.substring(indexAt+1, i), 10);
+            dice.sides = roll.substring(indexAt+1, i) >> 0;
             indexAt = i;
-            dice.modifier = parseInt(roll.substring(indexAt+1, l), 10) * -1;
+            dice.modifier = (roll.substring(indexAt+1, l) >> 0) * -1;
             break;
           }
         }
 
         if (!dice.sides) {
-          dice.sides = parseInt(roll.substring(indexAt+1, roll.length), 10);
+          dice.sides = roll.substring(indexAt+1, roll.length) >> 0;
         }
       }
 
@@ -69,7 +72,7 @@
 
     /**
      * Rolls the dice, and handles the result based on optional parameters, then returns the result object
-     * 
+     *
      * @param  {object} dice     The dice to be rolled, if string, calls parseDice.
      * @param  {object} options  An object containing optional parameter overrides.
      * @return {object}          A object containing all of the roll results, as well as the total.
@@ -90,7 +93,7 @@
           i = 0,
           l = 0;
 
-      options = this.extend({
+      options = dices.extend({
         multiMod    :  false, // Add modifier to for each dice rolled, instead of only once.
         dropLowest  :  0,     // Useful for quick character stats generation
         dropHighest :  0,     // I don't know why you'd need this, but here it is anyway!
@@ -102,16 +105,16 @@
         return result;
       }
       else if (typeof dice === 'string') {
-        parsedDice = this.parseRoll(dice);
+        parsedDice = dices.parseRoll(dice);
       }
-      else if (typeof dice === 'object' && this.isInt(dice.count) && this.isInt(dice.sides)) {
+      else if (typeof dice === 'object' && dices.isInt(dice.count) && dices.isInt(dice.sides)) {
         parsedDice = dice;
       }
       else {
         return result;
       }
 
-      for (i = 0, l = parsedDice.count; i < l; ++i) {
+      for (i = 0, l = parsedDice.count; i < l; i += 1) {
 
         rolled = Math.round(Math.random() * (parsedDice.sides - 1)) + 1;
         rolled = rolled * options.multiplier;
@@ -124,23 +127,21 @@
 
       }
 
-
       // TODO: Re-sort array back to original state, instead of leaving it sorted by value
-      if (this.isInt(options.dropLowest) && options.dropLowest > 0) {
+      if (dices.isInt(options.dropLowest) && options.dropLowest > 0) {
 
-        result.rolls.sort(this.highSort);
+        result.rolls.sort(dices.highSort);
         result.rolls.length -= options.dropLowest;
 
       }
-      if (this.isInt(options.dropHighest) && options.dropLowest > 0) {
+      if (dices.isInt(options.dropHighest) && options.dropLowest > 0) {
 
-        result.rolls.sort(this.lowSort);
+        result.rolls.sort(dices.lowSort);
         result.rolls.length -= options.dropHighest;
 
       }
 
-
-      for (i = 0, l = result.rolls.length; i < l; ++i) {
+      for (i = 0, l = result.rolls.length; i < l; i+=1) {
 
         result.total += result.rolls[i];
 
@@ -160,13 +161,11 @@
      */
     extend: function(a, b) {
 
-      for(var key in b) {
+      b = b || {};
 
-        if(b.hasOwnProperty(key)) {
-          a[key] = b[key];
-        }
-
-      }
+      Object.keys(b).forEach(function(key) {
+        a[key] = b[key];
+      });
 
       return a;
 
@@ -198,14 +197,14 @@
      */
     isInt: function(n) {
 
-      return n === parseInt(n, 10);
+      return n === (n >> 0);
 
     },
 
 
     version: function() {
 
-      return this.Version;
+      return dices.Version;
 
     },
 

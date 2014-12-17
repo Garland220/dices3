@@ -7,16 +7,17 @@ A simple, light, and flexible dice rolling library, for both PHP, and JavaScript
 Javascript
 --------------
 
-	dices.roll("1d6+4"); // Rolls 1 dice with 6 sides, and adds a modifier of 4 to the result
+	dices.roll('1d6+4'); // Rolls 1 dice with 6 sides, and adds a modifier of 4 to the result
 
 **With options**
 
 	dices.roll('4d6', {dropLowest: 1}); // Will roll 4 dice with 6 sides, and drop the lowest one from the result.
 
+
 PHP
 --------------
 
-	dices::roll("1d6+4"); // Rolls 1 dice with 6 sides, and adds a modifier of 4 to the result
+	dices::roll('1d6+4'); // Rolls 1 dice with 6 sides, and adds a modifier of 4 to the result
 
 **With options**
 

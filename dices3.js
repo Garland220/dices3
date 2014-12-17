@@ -18,7 +18,6 @@
      */
     parseRoll: function(roll) {
 
-      /** @private */
       var dice = {
             count: 0,
             sides: 0,
@@ -79,7 +78,6 @@
      */
     roll: function(dice, options) {
 
-      /** @private */
       var parsedDice = {
             count: 0,
             sides: 0,

@@ -5,52 +5,52 @@
  */
 class dices {
 
-	private static $version = '3.1.0';
+	private static $version = '3.1.3';
 
 
 	/**
-     * Parses a dice string (e.g '1d6') into an array
-     * 
-     * @param  {string} 
-     * @return {array} return an array containing count, sides, and modifier values
-     */
-	public function parseRoll($roll) {
+	 * Parses a dice string (e.g '1d6') into an array
+	 *
+	 * @param  {string}
+	 * @return {array} return an array containing count, sides, and modifier values
+	 */
+	public static function parseRoll($roll) {
 
 		$dice = array(
 			'count' => 0,
 			'sides' => 0,
 			'modifier' => 0
 		);
-		$arr = array();
-		$roll = strtolower($roll);
+		$array = array();
 
 		if (empty($roll)) {
 			return $dice;
 		}
-		else if (strrpos($roll, 'd') === -1) {
+		else if (stripos($roll, 'd') === -1) {
 			return $dice;
 		}
 		else {
-			$arr = split('d', $roll);
+			$array = explode('d', $roll);
 
-			$dice['count'] = intval($roll[0], 10);
+			$dice['count'] = (int)$array[0];
 
-			if ($arr[1]) {
-				if (strrpos($arr[1], '+')) {
-					$arr = split($arr[1], '+');
-					$dice['modifier'] = intval($arr[1], 10);
+			if ($array[1]) {
+
+				if (strrpos($array[1], '+') !== false) {
+					$array = explode('+', $array[1]);
+					$dice['modifier'] = (int)$array[1];
 				}
-				else if (strrpos($arr[1], '-')) {
-					$arr = split($arr[1], '-');
-					$dice['modifier'] = intval($arr[1], 10) * -1;
+				else if (strrpos($array[1], '-') !== false) {
+					$array = explode('-', $array[1]);
+					$dice['modifier'] = (int)$array[1] * -1;
 				}
 				else {
-					$arr[0] = intval($arr[1], 10);
+					$array[0] = (int)$array[1];
 				}
 
-				$dice['sides'] = $arr[0];
+				$dice['sides'] = $array[0];
 			}
-		}		
+		}
 
 		return $dice;
 
@@ -58,29 +58,28 @@ class dices {
 
 
 	/**
-     * Rolls the dice, and handles the result based on optional parameters, then returns the result array
-     * 
-     * @param  {array} dice     The dice to be rolled, if string, calls parseDice.
-     * @param  {array} options  An array containing optional parameter overrides.
-     * @return {array}          A array containing all of the roll results, as well as the total.
-     */
-	public function roll($dice, $options = array()) {
+	 * Rolls the dice, and handles the result based on optional parameters, then returns the result array
+	 *
+	 * @param  {array} dice     The dice to be rolled, if string, calls parseDice.
+	 * @param  {array} options  An array containing optional parameter overrides.
+	 * @return {array}          A array containing all of the roll results, as well as the total.
+	 */
+	public static function roll($dice, $options = array()) {
 
 		$result = array(
 			'rolls' => array(),
 			'total' => 0,
-		);	
+		);
 		$parsedDice;
 
 		$options = array_merge(array(
 			'multiMod' 	  =>  false, // Add modifier to for each dice rolled, instead of only once.
 			'dropLowest'  =>  0,     // Useful for quick character stats generation
-	        'dropHighest' =>  0,     // I don't know why you'd need this, but here it is anyway!
-	        'multiplier'  =>  1      // Probably only useful for very specific needs. Multies roll, before adding modifier
+			'dropHighest' =>  0,     // I don't know why you'd need this, but here it is anyway!
+			'multiplier'  =>  1      // Probably only useful for very specific needs. Multies roll, before adding modifier
 		), $options);
 
 		if (empty($dice)) {
-			echo 'empty';
 			return $result;
 		}
 		else if (is_string($dice)) {
@@ -90,21 +89,17 @@ class dices {
 			$parsedDice = $dice;
 		}
 		else {
-			echo 'test';
 			return $result;
 		}
 
-		echo $options['multiplier'];
-
-		for ($i = 0; $i < $parsedDice['count']; ++$i) {
+		$count = (int)$parsedDice['count'];
+		for ($i = 0; $i < $count; ++$i) {
 			$rolled = ceil(lcg_value() * $parsedDice['sides'] - 1) + 1;
 			$rolled = $rolled * $options['multiplier'];
 
 			if ($options['multiMod']) {
 				$rolled += $parsedDice['modifier'];
 			}
-
-			echo $rolled . " | ";
 
 			$result['rolls'][$i] = $rolled;
 		}
@@ -136,7 +131,8 @@ class dices {
 		}
 
 
-		for ($i = 0; $i < count($result['rolls']); ++$i) {
+		$count = (int)count($result['rolls']);
+		for ($i = 0; $i < $count; ++$i) {
 
 			$result['total'] += $result['rolls'][$i];
 
@@ -161,20 +157,20 @@ class dices {
 
 	/**
 	 * Reverse Natural Sorts the array.
-	 * 
+	 *
 	 * @param  [array] $arr Takes an array
 	 * @return [array]      Returns same array, reverse natural sorted
 	 */
-	public function rnatsort(&$arr){
+	public static function rnatsort(&$array){
 
-	    natsort($arr);
+		natsort($array);
 
-	    $arr = array_reverse($arr, true);
+		$array = array_reverse($arr, true);
 
 	}
 
 
-	public function version() {
+	public static function version() {
 
 		return self::$version;
 

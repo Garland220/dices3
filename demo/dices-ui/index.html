@@ -109,6 +109,10 @@
         };
       }
 
+      function getType(dice) {
+        return dice.substring(dice.indexOf('d'));
+      }
+
       function roll(dice, mod, args) {
         mod = mod || 0;
         mod = Number(mod)
@@ -131,11 +135,11 @@
 
         addResult(output, dice, resultContainer);
         resultContainer.scrollTop = 9999999999;
-        handleHighlight(dice.substring(1));
+        handleHighlight(getType(dice));
       }
 
-      function addResult(string, type, container) {
-        output = '<div class="{0}">{1}</div>'.format(type.substring(1), string);
+      function addResult(string, dice, container) {
+        output = '<div class="{0}">{1}</div>'.format(getType(dice), string);
         container.innerHTML += output;
       }
 

@@ -1,0 +1,124 @@
+html, body {
+	padding: 0;
+	margin: 0;
+	height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+pre {
+	white-space: pre-wrap;
+	white-space: -moz-pre-wrap;
+	white-space: -pre-wrap;
+	white-space: -o-pre-wrap;
+	word-wrap: break-word;
+}
+
+.diceBag {
+	margin: 10px;
+	float: left;
+	width: 400px;
+}
+.diceBag ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.diceBag ul li {
+	display: block;
+	padding: 10px;
+	border-radius: 10px;
+}
+.diceBag ul li:hover {
+	background: #ccccee;
+}
+.diceBag input {
+	height: 40px;
+	font-size: 20px;
+	border: 1px solid #eee;
+	text-align: right;
+	border-radius: 10px;
+	padding: 0 10px;
+}
+.diceBag input[type=text] {
+	width: 60px;
+}
+.diceBag input[type=button] {
+	cursor: pointer;
+}
+
+#results {
+	margin-top: 10px;
+	background: #eee;
+	height: 90%;
+	width: 400px;
+	float: left;
+	overflow: scroll;
+	padding: 10px;
+	border-radius: 10px;
+	border: 1px solid #ccc;
+	text-align: right;
+	box-sizing: border-box;
+}
+#results div {
+	padding: 2px 4px;
+	color: #555;
+}
+#results div.highlight {
+	background: #ccccee;
+	color: #000;
+}
+
+.diceSprite {
+	background: url(dice.png) no-repeat;
+}
+.diceSprite.d6 {
+	background-position: -50px 0;
+}
+.diceSprite.d4 {
+	background-position: 0 0;
+}
+.diceSprite.d8 {
+	background-position: -99px 0;
+}
+.diceSprite.d10 {
+	background-position: -149px 0;
+}
+.diceSprite.d100 {
+	background-position: -199px 0;
+}
+.diceSprite.d12 {
+	background-position: -249px 0;
+}
+.diceSprite.d20 {
+	background-position: -300px 0;
+}
+
+.dice {
+	margin: 0 18px;
+	cursor: pointer;
+	float: left;
+	width: 51px;
+	height: 51px;
+	border: none;
+	opacity: 0.4;
+	-moz-opacity: 0.4;
+	filter: alpha(opacity=40);
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	color: #0e5b97;
+	font-size: 50px;
+}
+.diceBag ul li:hover .dice,
+.dice:hover {
+	opacity: 1;
+	-moz-opacity: 1;
+	filter: alpha(opacity=100);
+	z-index: 20;
+}
+
+.left { float: left; }
+.right { float: right; }
+.clear { clear: both; }

@@ -10,6 +10,9 @@
     Version: '3.1.3',
 
 
+    // TODO: add 'dropped' array to return dropped rolls
+
+
     /**
      * Parses a dice string into an object
      *

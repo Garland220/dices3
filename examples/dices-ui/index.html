@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dices3.1</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <script src="../../dices3.js"></script>
+  </head>
+  <body>
+    <div class="diceBag">
+      <ul>
+        <li class="d4">
+          <a onClick="roll('1d4');" title="1d4"><div class="dice diceSprite d4"></div></a>
+          <input type="text" name="d4" value="1" placeholder='Count' /> +
+          <input type="text" name="d4m" value="0" placeholder='Mod' />
+          <input type="button" value="Roll" onclick="roll(fVal('d4')+'d4', fVal('d4m'))" />
+        </li>
+
+        <li class="d6">
+          <a onClick="roll('1d6');" title="1d6"><div class="dice diceSprite d6"></div></a>
+          <input type="text" name="d6" value="1" placeholder='Count' /> +
+          <input type="text" name="d6m" value="0" placeholder='Mod' />
+          <input type="button" value="Roll" onclick="roll(fVal('d6')+'d6', fVal('d6m'))" />
+        </li>
+
+        <li class="d8">
+          <a onClick="roll('1d8');" title="1d8"><div class="dice diceSprite d8"></div></a>
+          <input type="text" name="d8" value="1" placeholder='Count' /> +
+          <input type="text" name="d8m" value="0" placeholder='Mod' />
+          <input type="button" value="Roll" onclick="roll(fVal('d8')+'d8', fVal('d8m'))" />
+        </li>
+
+        <li class="d10">
+          <a onClick="roll('1d10');" title="1d10"><div class="dice diceSprite d10"></div></a>
+          <input type="text" name="d10" value="1" placeholder='Count' /> +
+          <input type="text" name="d10m" value="0" placeholder='Mod' />
+          <input type="button" value="Roll" onclick="roll(fVal('d10')+'d10', fVal('d10m'))" />
+        </li>
+
+        <li class="d100">
+          <a onClick="roll('1d10', 0, {multiplier: 10});" title="1d10x10"><div class="dice diceSprite d100"></div></a>
+          <input type="text" name="d100" value="1" placeholder='Count' /> +
+          <input type="text" name="d100m" value="0" placeholder='Mod' />
+          <input type="button" value="Roll" onclick="roll(fVal('d100')+'d10', fVal('d100m'), {multiplier: 10})" />
+        </li>
+
+        <li class="d12">
+          <a onClick="roll('1d12');" title="1d12"><div class="dice diceSprite d12"></div></a>
+          <input type="text" name="d12" value="1" placeholder='Count' /> +
+          <input type="text" name="d12m" value="0" placeholder='Mod' />
+          <input type="button" value="Roll" onclick="roll(fVal('d12')+'d12', fVal('d12m'))" />
+        </li>
+
+        <li class="d20">
+          <a onClick="roll('1d20');" title="1d20"><div class="dice diceSprite d20"></div></a>
+          <input type="text" name="d20" value="1" placeholder='Count' /> +
+          <input type="text" name="d20m" value="0" placeholder='Mod' />
+          <input type="button" value="Roll" onclick="roll(fVal('d20')+'d20', fVal('d20m'))" />
+        </li>
+
+        <li class="dp">
+          <a onClick="roll('1d100');" style="text-decoration: none;" title="1d100"><div class="dice" style="border: none; text-indent: 3px;">%</div></a>
+          <input type="text" name="dper" value="1" placeholder='Count' /> +
+          <input type="text" name="dpm" value="0" placeholder='Mod' />
+          <input type="button" value="Roll" onclick="roll(fVal('dper')+'d100', fVal('dpm'))" />
+        </li>
+
+        <li class="dx">
+          <input type="text" name="dxs" value="" placeholder="Sides" />
+          <input type="text" name="dxc" value="" placeholder="Count" /> +
+          <input type="text" name="dxm" value="0" placeholder='Mod' />
+          <input type="button" value="Roll" onclick="roll(fVal('dxc')+'d'+fVal('dxs'), fVal('dxm'))" />
+        </li>
+      </ul>
+    </div>
+
+    <div id="results"></div>
+    <br class="clear" />
+
+    <script>
+      resultContainer = document.getElementById('results');
+
+      var forEach = function (array, callback, scope) {
+        for (var i = 0; i < array.length; i++) {
+          callback.call(scope, i, array[i]);
+        }
+      };
+
+      function hasClass(el, className) {
+        if (el.classList)
+          return el.classList.contains(className)
+        else
+          return !!el.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'))
+      }
+
+      function addClass(el, className) {
+        if (el.classList)
+          el.classList.add(className)
+        else if (!hasClass(el, className)) el.className += " " + className;
+      };
+
+      function removeClass(el, className) {
+        if (el.classList)
+          el.classList.remove(className)
+        else if (hasClass(el, className)) {
+          var reg = new RegExp('(\\s|^)' + className + '(\\s|$)')
+          el.className=el.className.replace(reg, ' ')
+        }
+      }
+
+
+      if (!String.prototype.format) {
+        String.prototype.format = function() {
+          var args = arguments;
+          return this.replace(/{(\d+)}/g, function(match, number) {
+            return typeof args[number] != 'undefined' ? args[number] : match;
+          });
+        };
+      }
+
+      function roll(dice, mod, args) {
+        mod = mod || 0;
+        var result = dices.roll(dice+'+'+mod, args);
+        output = '{0}+{1}: <strong>{2}</strong> ({3})'.format(dice, mod, result.total, result.rolls)
+
+        addResult(output, dice, resultContainer);
+        resultContainer.scrollTop = 9999999999;
+        handleHighlight(dice.substring(1));
+      }
+      function addResult(string, type, container) {
+        output = '<div class="{0}">{1}</div>'.format(type.substring(1), string);
+
+
+        container.innerHTML += output;
+      }
+      function fVal(field) {
+        return document.getElementsByName(field)[0].value;
+      }
+      function clearResults() {
+        resultContainer.innerHTML = '';
+      }
+      function handleHighlight(className) {
+        clearHighlight();
+        forEach(document.querySelectorAll('#results .'+className), function (i, row) {
+          addClass(row, 'highlight')
+        });
+      }
+      function clearHighlight() {
+        forEach(document.querySelectorAll('#results .highlight'), function (i, row) {
+          removeClass(row, 'highlight')
+        });
+      }
+
+      forEach(document.querySelectorAll('.diceBag ul li'), function (i, dice) {
+        dice.addEventListener("mouseenter", function() {
+          handleHighlight(this.className);
+        });
+        dice.addEventListener("mouseleave", function() {
+          clearHighlight();
+        });
+      });
+    </script>
+  </body>
+</html>

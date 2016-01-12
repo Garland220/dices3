@@ -1,7 +1,7 @@
 Dices3.1
 ==============
 
-A simple, light, and flexible dice rolling library, for both PHP, and JavaScript.
+A simple, light, and flexible dice rolling library, JavaScript, Ruby, or PHP.
 
 
 Javascript
@@ -12,6 +12,16 @@ Javascript
 **With options**
 
 	dices.roll('4d6', {dropLowest: 1}); // Will roll 4 dice with 6 sides, and drop the lowest one from the result.
+
+
+Ruby
+--------------
+
+  Dices.roll('1d6+4') // Rolls 1 dice with 6 sides, and adds a modifier of 4 to the result
+
+**With options**
+
+  Dices.roll('4d6', {}) // Will roll 4 dice with 6 sides, and drop the lowest one from the result.
 
 
 PHP

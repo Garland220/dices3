@@ -17,11 +17,11 @@ Javascript
 Ruby
 --------------
 
-  Dices.roll('1d6+4') // Rolls 1 dice with 6 sides, and adds a modifier of 4 to the result
+	Dices.roll('1d6+4') // Rolls 1 dice with 6 sides, and adds a modifier of 4 to the result
 
 **With options**
 
-  Dices.roll('4d6', {}) // Will roll 4 dice with 6 sides, and drop the lowest one from the result.
+	Dices.roll('4d6', {}) // Will roll 4 dice with 6 sides, and drop the lowest one from the result.
 
 
 PHP

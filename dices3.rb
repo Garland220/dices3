@@ -37,12 +37,12 @@ class Dices
 
       dice.count = arr[0].to_i
 
-      if not arr.index('+').nil?
-        arr2 = arr.split('+')
+      if not arr[1].index('+').nil?
+        arr2 = arr[1].split('+')
         dice.sides = arr2[0].to_i
         dice.modifier = arr2[1].to_i
-      elsif not arr.index('-').nil?
-        arr2 = arr.split('-')
+      elsif not arr[1].index('-').nil?
+        arr2 = arr[1].split('-')
         dice.sides = arr2[0].to_i
         dice.modifier = arr2[1].to_i
       else
@@ -91,4 +91,4 @@ class Dices
 
 end
 
-puts Dices.roll('3d6+1', {})
+#puts Dices.roll('3d6+1', {})

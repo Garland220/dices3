@@ -48,6 +48,11 @@ pre {
 .diceBag input[type=button] {
 	cursor: pointer;
 }
+.diceBag input[type=button]:hover {
+	background: #9999ff;
+	border-color: #aaaacc;
+	color: #fff;
+}
 
 #results {
 	margin-top: 10px;

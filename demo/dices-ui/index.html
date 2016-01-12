@@ -85,13 +85,6 @@
         }
       };
 
-      function hasClass(el, className) {
-        if (el.classList)
-          return el.classList.contains(className)
-        else
-          return !!el.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'))
-      }
-
       function addClass(el, className) {
         if (el.classList)
           el.classList.add(className)
@@ -107,7 +100,6 @@
         }
       }
 
-
       if (!String.prototype.format) {
         String.prototype.format = function() {
           var args = arguments;
@@ -119,31 +111,49 @@
 
       function roll(dice, mod, args) {
         mod = mod || 0;
-        var result = dices.roll(dice+'+'+mod, args);
-        output = '{0}+{1}: <strong>{2}</strong> ({3})'.format(dice, mod, result.total, result.rolls)
+        mod = Number(mod)
+
+        var result = {}
+
+        if (mod == 0) {
+          modString = '';
+        }
+        else if (mod > 0) {
+          modString = '+{0}'.format(mod);
+        }
+        else {
+          modString = mod;
+        }
+
+        result = dices.roll(dice + modString, args);
+
+        output = '{0}{1}: <strong>{2}</strong> ({3})'.format(dice, modString, result.total, result.rolls)
 
         addResult(output, dice, resultContainer);
         resultContainer.scrollTop = 9999999999;
         handleHighlight(dice.substring(1));
       }
+
       function addResult(string, type, container) {
         output = '<div class="{0}">{1}</div>'.format(type.substring(1), string);
-
-
         container.innerHTML += output;
       }
+
       function fVal(field) {
         return document.getElementsByName(field)[0].value;
       }
+
       function clearResults() {
         resultContainer.innerHTML = '';
       }
+
       function handleHighlight(className) {
         clearHighlight();
         forEach(document.querySelectorAll('#results .'+className), function (i, row) {
           addClass(row, 'highlight')
         });
       }
+
       function clearHighlight() {
         forEach(document.querySelectorAll('#results .highlight'), function (i, row) {
           removeClass(row, 'highlight')
